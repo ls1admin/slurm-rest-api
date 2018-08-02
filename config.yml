@@ -1,0 +1,19 @@
+#system:
+#        use_acct_db: True        # Use the account database. If this is disabled, related routes will 404
+#        use_cors: False          # Use CORS for hosting and serving locally
+#        debug: False             # Add flask debugging, JSON will be formatted to be human readable
+#        serve_index: True        # Serve a homepage via flask, should only be used for developing
+#        archive_usage_load: True # Log the load statistics
+#        archive_wait_time: 60    # Time to wait between log entries (in seconds), also sets the default time to retrieve load to value so it returns 1 item by default
+#        archive_path: 'db.json'  # Path to store db, creates a json file
+#database:
+#        db_host: slurm.server.ca                # Host address of account database
+#        db_user: username                       # Username to access database
+#        db_pass: password                       # Password
+#        db_name: slurm_acct_db                  # Name of database
+#        table_assoc: slurm_assoc_table          # Schema name of slurm assoc table
+#        table_job: slurm_job_table              # Schema name of slurm job table
+#filter:                         # Filter out results that should not be visible with the api
+#        partitions:             # Filter partitions by name
+#                - secret
+#                - confidential

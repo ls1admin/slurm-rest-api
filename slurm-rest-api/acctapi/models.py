@@ -2,10 +2,10 @@ from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 from database import Base
 from datetime import datetime
-from config import ASSOC_TABLE_NAME, JOB_TABLE_NAME
+import config
 
 class Assoc(Base):
-    __tablename__ = ASSOC_TABLE_NAME
+    __tablename__ = config.database['table_assoc']
     id_assoc = Column(Integer, primary_key=True)
     user = Column(String)
     acct = Column(String)
@@ -23,7 +23,7 @@ class Assoc(Base):
         return me
 
 class Job(Base):
-    __tablename__ = JOB_TABLE_NAME
+    __tablename__ = config.database['table_job']
     id_job =  Column(Integer, primary_key=True)
     id_user = Column(Integer)
     id_assoc = Column(Integer)

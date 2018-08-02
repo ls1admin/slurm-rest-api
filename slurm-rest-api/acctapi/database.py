@@ -1,11 +1,16 @@
 # taken from http://flask.pocoo.org/docs/0.11/patterns/sqlalchemy/#declarative
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, exc
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-from config import *
+import config
 
-engine = create_engine('mysql://%s:%s@%s/%s' %(DB_USER,DB_PASS,DB_HOST,DB_NAME))
+engine = create_engine('mysql://%s:%s@%s/%s' %(
+    config.database['db_user'],
+    config.database['db_pass'],
+    config.database['db_host'],
+    config.database['db_name']
+))
 db_session = scoped_session(sessionmaker(autocommit=False,
                                          autoflush=False,
                                          bind=engine))
@@ -18,4 +23,7 @@ def init_db():
     # you will have to import them first before calling init_db()
 
     from models import Job,Assoc
-    Base.metadata.create_all(bind=engine)
+    try:
+        Base.metadata.create_all(bind=engine)
+    except exc.SQLAlchemyError as e:
+        print("Error encountered while connecting to acct_db:" + e.message)

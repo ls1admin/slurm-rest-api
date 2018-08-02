@@ -1,0 +1,14 @@
+[Unit]
+Description=uWSGI instance to serve slurm-rest-api
+After=network.target
+
+[Service]
+User=nginx
+Group=slurm-rest-api-group
+WorkingDirectory=/opt/slurm-rest-api/slurm-rest-api
+Environment=SLURM_REST_API_CONFIG=/opt/slurm-rest-api/config.yml
+ExecStart=/bin/bash -c 'cd /opt/slurm-rest-api/slurm-rest-api && source /opt/miniconda2/bin/activate /opt/slurm-rest-api/env && /opt/slurm-rest-api/env/bin/uwsgi --ini slurm-rest-api.ini'
+
+[Install]
+WantedBy=multi-user.target
+

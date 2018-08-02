@@ -1,0 +1,87 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<script type="text/javascript">
+      var getJSON = function(url, callback) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', url, true);
+        xhr.responseType = 'json';
+        xhr.onload = function() {
+          var status = xhr.status;
+          if (status === 200) {
+            callback(null, xhr.response);
+          } else {
+            callback(status, xhr.response);
+          }
+        };
+        xhr.send();
+      };
+
+      var getRouteStatus = function(url, route, node) {
+      	getJSON(url, function(err, data) {
+          var msg = "";
+          if (err !== null) {
+            msg = route +' | Server Error! Error code: ' + err + '<br/>See console log for details.';
+          } else if(data.errors) {
+            msg = route +' | Route Error! See console log for details.'
+          } else {
+            msg = route +' | Route OK!'
+          }
+          node.innerHTML = msg;
+        });
+      };
+
+      window.onload = function() {
+      	var usersStatus = document.createElement('div');
+        usersStatus.innerHTML = "/users | loading...";
+        var node = document.getElementById("div_status");
+        node.appendChild(usersStatus);
+
+        var historyStatus = document.createElement('div');
+        historyStatus.innerHTML = "/history | loading...";
+        node.appendChild(historyStatus);
+
+        var queueStatus = document.createElement('div');
+        queueStatus.innerHTML = "/queue | loading...";
+        node.appendChild(queueStatus);
+
+        var partitionsStatus = document.createElement('div');
+        partitionsStatus.innerHTML = "/partitions | loading...";
+        node.appendChild(partitionsStatus);
+
+        var usageStatus = document.createElement('div');
+        usageStatus.innerHTML = "/usage | loading...";
+        node.appendChild(usageStatus);
+
+        var nodesStatus = document.createElement('div');
+        nodesStatus.innerHTML = "/nodes | loading...";
+        node.appendChild(nodesStatus);
+
+        var statsStatus = document.createElement('div');
+        statsStatus.innerHTML = "/stats | loading...";
+        node.appendChild(statsStatus);
+
+        var loadStatus = document.createElement('div');
+        loadStatus.innerHTML = "/load | loading...";
+        node.appendChild(loadStatus);
+
+	var host_url = window.location.href;
+        getRouteStatus(host_url + "users", "/users", usersStatus);
+        getRouteStatus(host_url + "history", "/history", historyStatus);
+        getRouteStatus(host_url + "queue", "/queue", queueStatus);
+        getRouteStatus(host_url + "partitions", "/partitions", partitionsStatus);
+        getRouteStatus(host_url + "usage", "/usage", usageStatus);
+        getRouteStatus(host_url + "nodes", "/nodes", nodesStatus);
+        getRouteStatus(host_url + "stats", "/stats", statsStatus);
+        getRouteStatus(host_url + "load", "/load", loadStatus);
+      }
+	</script>
+</head>
+<body>
+	Slurm-rest-api is Running!<br/>
+	You can customize this page by editing slurm-rest-api/static/index.html<br/><br/>
+
+	Route Status:
+	<div id="div_status"></div>
+</body>
+</html>

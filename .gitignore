@@ -1,0 +1,12 @@
+*.pyc
+*.pyo
+*.swp
+__pycache__/
+build/
+*.egg-info
+dist/
+.nfs*
+pyslurm-install/
+env/
+uwsgi.log
+db.json
