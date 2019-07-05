@@ -10,3 +10,4 @@ pyslurm-install/
 env/
 uwsgi.log
 db.json
+.idea/

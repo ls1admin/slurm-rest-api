@@ -4,7 +4,10 @@ import config
 import pyslurm
 import pwd
 import re
+import json
 import time
+import mysql.connector
+
 
 import filter_slurm
 from parse_slurm_node_list import parse_all_lists, parse_list
@@ -81,6 +84,7 @@ class Slurm_Partitions(Resource):
         return json_data
 
 class Slurm_Load(Resource):
+
     def get(self):
         json_data = {}
         try:
@@ -106,9 +110,21 @@ class Slurm_Load(Resource):
         q_start_time = now - args['time'] - args['offset']
         q_end_time = now - args['offset']
 
-        db = TinyDB(config.system['archive_path'])
-        Q = Query()
-        return db.search((Q.time >= q_start_time) & (Q.time <= q_end_time))
+        mysqldb = mysql.connector.connect(
+            host=config.system['mysql_db_host'],
+            user=config.system['mysql_db_user'],
+            passwd=config.system['mysql_db_pass'],
+            database=config.system['mysql_db_name'])
+        my_cur = mysqldb.cursor()
+        sqlc = "select data_dump from loadtable where time_id >= {} && time_id <= {}".format(q_start_time, q_end_time)
+        my_cur.execute(sqlc)
+        res = my_cur.fetchall()
+
+        my_data = []
+        for x in res:
+            my_data.append(json.loads(x[0]))
+
+        return my_data
 
 class Slurm_Usage(Resource):
     def get(self):
@@ -130,6 +146,7 @@ class Slurm_Usage(Resource):
             }
             json_data["errors"] = [error]
             print("Error: " + self.__str__() + " : " + e.message)
+            print("error message" + str(e.args))
 
         return json_data
 
@@ -190,6 +207,12 @@ class Slurm_Usage(Resource):
             if j_data[job]['job_state'] in ['RUNNING', 'SUSPENDED']:  
                 part = j_data[job]['partition']
                 for c in j_data[job]['cpus_allocated']:
+                    if 'cpus_allocated' not in part_data[part]['nodes'][c]:
+                        part_data[part]['nodes'][c]['cpus_allocated'] = 0
+                    if 'mem_allocated' not in part_data[part]['nodes'][c]:
+                        part_data[part]['nodes'][c]['mem_allocated'] = 0
+                    if 'running_jobs' not in part_data[part]['nodes'][c]:
+                        part_data[part]['nodes'][c]['running_jobs'] = 0
                     part_data[part]['nodes'][c]['cpus_allocated'] = part_data[part]['nodes'][c]['cpus_allocated'] + j_data[job]['cpus_allocated'][c]
                     if j_data[job]['min_memory_node']:
                         part_data[part]['nodes'][c]['mem_allocated'] = part_data[part]['nodes'][c]['mem_allocated'] + j_data[job]['min_memory_node']

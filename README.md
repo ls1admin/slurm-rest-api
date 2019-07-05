@@ -103,6 +103,28 @@ pip install .
 ```
 pyslurm is now installed on your conda environment.
 
+####Database
+
+You will need to setup a mariadb database
+
+    $ sudo yum install mariadb-server
+    $ sudo systemctl start mariadb
+    $ sudo systemctl enable mariadb
+
+Set up your database
+
+    $ mysqladmin -u root password NEWPASSWORD
+    $ mysql -p -u root
+
+Enter the following commands to set up the database now that you are logged in
+
+    > CREATE USER 'user'@'localhost' IDENTIFIED BY 'password';
+    > CREATE DATABASE slurmrestapi;
+    > GRANT ALL PRIVILEGES ON slurmrestapi.* TO 'user'@'localhost';
+    > USE slurmrestapi;
+    > CREATE TABLE loadtable( time_id INT NOT NULL, data_dump LONGTEXT NOT NULL, PRIMARY KEY(time_id) );
+
+
 ##### Install and Run
 
 Slurm-rest-api gets installed with pip and then runs locally with network access.
@@ -291,10 +313,6 @@ Returns a list of time stamped load information. When usage load archiving is ac
 | --- | --- | --- | --- | --- |
 | `time` | `=` | Time period of data to return, measured in seconds (last X seconds) | Same as `archive_wait_time` so a single entry is returned | `http://localhost:5000/load?time=60` |
 | `offset` | `=` | Number of seconds to skip, can be used as a "next page" when the number is set to a multiple of the limit parameter | `0` | `http://localhost:5000/load?time=60&offset=120` |
-
-
-## Front end exampls for the API ##
-https://github.com/phac-nml/slurm-rest-api-front
 
 
 ## Legal ##

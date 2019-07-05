@@ -1,11 +1,13 @@
 import threading
 import time
+import json
+import mysql.connector
 
 from slurmapi import Slurm_Usage
+import config
 
-def archive_load(db, wait_time):
+def archive_load(wait_time):
     timer = AsyncTimer()
-    timer.db = db
     timer.wait_time = wait_time
     timer.start()
 
@@ -15,6 +17,7 @@ class AsyncTimer(threading.Thread):
             usage_data = Slurm_Usage().get()
 
             if 'errors' in usage_data:
+                print("usage_data errors: " + str(usage_data))
                 print("Error in Usage route, unable to log load data, see error log for more information")
             else:
                 usage_data = usage_data['data']
@@ -41,7 +44,22 @@ class AsyncTimer(threading.Thread):
                 load_data['alloc_cpus'] = usage_data['alloc_cpus']
                 load_data['alloc_mem'] = usage_data['alloc_mem']
                 load_data['partitions'] = partitions
-                self.db.insert(load_data)
 
-                time.sleep(self.wait_time)
+                # import pdb; pdb.set_trace()
+                my_time = load_data['time']
+                my_data = json.dumps(load_data)
+                sqlc= 'INSERT INTO loadtable (time_id, data_dump) VALUES (%s, %s)'
+                valc= (my_time, my_data)
+
+                mysqldb = mysql.connector.connect(
+                    host=config.system['mysql_db_host'],
+                    user=config.system['mysql_db_user'],
+                    passwd=config.system['mysql_db_pass'],
+                    database=config.system['mysql_db_name']
+                )
+                my_cur = mysqldb.cursor()
+                my_cur.execute(sqlc, valc)
+                mysqldb.commit()
+
+            time.sleep(self.wait_time)
 

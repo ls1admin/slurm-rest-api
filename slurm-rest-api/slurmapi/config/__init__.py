@@ -15,6 +15,10 @@ system = dict(
     archive_usage_load = False,
     archive_wait_time = 60,
     archive_path = 'db.json',
+    mysql_db_host = 'localhost',
+    mysql_db_user = 'user',
+    mysql_db_pass = 'password',
+    mysql_db_name = 'slurmrestapi',
 )
 
 # Change to yaml values

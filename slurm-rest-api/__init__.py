@@ -3,7 +3,6 @@ from flask_restful import Api
 from flask_cors import CORS
 from acctapi import db_session, init_db, JobHistoryApi, UserAssocApi
 from slurmapi import Slurm_Queue, Slurm_Statistics, Slurm_Nodes, Slurm_Partitions, Slurm_Usage, Slurm_Load, archive_load
-from tinydb import TinyDB
 import config
 
 application = Flask(__name__)
@@ -32,8 +31,7 @@ api.add_resource(Slurm_Usage, '/usage')
 
 if config.system['archive_usage_load']:
     api.add_resource(Slurm_Load, '/load')
-    db = TinyDB(config.system['archive_path'])
-    archive_load(db, config.system['archive_wait_time'])
+    archive_load(config.system['archive_wait_time'])
 
 # we can serve a webpage straight from flask, this should only be used for developing.
 if config.system['serve_index']:

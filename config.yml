@@ -5,7 +5,10 @@
 #        serve_index: True        # Serve a homepage via flask, should only be used for developing
 #        archive_usage_load: True # Log the load statistics
 #        archive_wait_time: 60    # Time to wait between log entries (in seconds), also sets the default time to retrieve load to value so it returns 1 item by default
-#        archive_path: 'db.json'  # Path to store db, creates a json file
+#        mysql_db_host: localhost
+#        mysql_db_user: user                   # Username to access database
+#        mysql_db_pass: password               # Password
+#        mysql_db_name: slurmrestapi           # Name of database
 #database:
 #        db_host: slurm.server.ca                # Host address of account database
 #        db_user: username                       # Username to access database

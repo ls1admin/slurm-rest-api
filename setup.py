@@ -15,5 +15,6 @@ setup(
         'tinydb',
         'ujson',
         'uwsgi',
+        'mysql-connector',
     ],
 )
