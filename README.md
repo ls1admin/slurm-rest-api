@@ -315,6 +315,10 @@ Returns a list of time stamped load information. When usage load archiving is ac
 | `offset` | `=` | Number of seconds to skip, can be used as a "next page" when the number is set to a multiple of the limit parameter | `0` | `http://localhost:5000/load?time=60&offset=120` |
 
 
+## Front end exampls for the API ##
+https://github.com/phac-nml/slurm-rest-api-front
+
+
 ## Legal ##
 
 Copyright Government of Canada 2018
