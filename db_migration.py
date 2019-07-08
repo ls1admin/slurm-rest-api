@@ -21,7 +21,12 @@ for entry in all_data:
     
     sqlc= 'INSERT INTO loadtable (time_id, data_dump) VALUES (%s, %s)'
     valc= (time, mydata)    
-    my_cur = mysqldb.cursor()
-    my_cur.execute(sqlc, valc)
-    mysqldb.commit()
+    
+    try:
+        my_cur = mysqldb.cursor()
+        my_cur.execute(sqlc, valc)
+        mysqldb.commit()
+        print("added to database")
+    except mysql.connector.errors.IntegrityError:
+        print("Already in database")
 
