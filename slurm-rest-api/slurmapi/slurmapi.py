@@ -207,16 +207,17 @@ class Slurm_Usage(Resource):
             if j_data[job]['job_state'] in ['RUNNING', 'SUSPENDED']:  
                 part = j_data[job]['partition']
                 for c in j_data[job]['cpus_allocated']:
-                    if 'cpus_allocated' not in part_data[part]['nodes'][c]:
-                        part_data[part]['nodes'][c]['cpus_allocated'] = 0
-                    if 'mem_allocated' not in part_data[part]['nodes'][c]:
-                        part_data[part]['nodes'][c]['mem_allocated'] = 0
-                    if 'running_jobs' not in part_data[part]['nodes'][c]:
-                        part_data[part]['nodes'][c]['running_jobs'] = 0
-                    part_data[part]['nodes'][c]['cpus_allocated'] = part_data[part]['nodes'][c]['cpus_allocated'] + j_data[job]['cpus_allocated'][c]
-                    if j_data[job]['min_memory_node']:
-                        part_data[part]['nodes'][c]['mem_allocated'] = part_data[part]['nodes'][c]['mem_allocated'] + j_data[job]['min_memory_node']
-                    part_data[part]['nodes'][c]['running_jobs'] = part_data[part]['nodes'][c]['running_jobs'] + 1
+                    if c in part_data[part]['nodes']:
+                        if 'cpus_allocated' not in part_data[part]['nodes'][c]:
+                            part_data[part]['nodes'][c]['cpus_allocated'] = 0
+                        if 'mem_allocated' not in part_data[part]['nodes'][c]:
+                            part_data[part]['nodes'][c]['mem_allocated'] = 0
+                        if 'running_jobs' not in part_data[part]['nodes'][c]:
+                            part_data[part]['nodes'][c]['running_jobs'] = 0
+                        part_data[part]['nodes'][c]['cpus_allocated'] = part_data[part]['nodes'][c]['cpus_allocated'] + j_data[job]['cpus_allocated'][c]
+                        if j_data[job]['min_memory_node']:
+                            part_data[part]['nodes'][c]['mem_allocated'] = part_data[part]['nodes'][c]['mem_allocated'] + j_data[job]['min_memory_node']
+                        part_data[part]['nodes'][c]['running_jobs'] = part_data[part]['nodes'][c]['running_jobs'] + 1
 
         for part in p_data:
             nodes_str = p_data[part]['nodes']
