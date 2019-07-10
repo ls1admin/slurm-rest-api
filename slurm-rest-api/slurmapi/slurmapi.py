@@ -207,7 +207,7 @@ class Slurm_Usage(Resource):
             if j_data[job]['job_state'] in ['RUNNING', 'SUSPENDED']:  
                 part = j_data[job]['partition']
                 for c in j_data[job]['cpus_allocated']:
-                    if c in part_data[part]['nodes']:
+                    if part in part_data and c in part_data[part]['nodes']:
                         if 'cpus_allocated' not in part_data[part]['nodes'][c]:
                             part_data[part]['nodes'][c]['cpus_allocated'] = 0
                         if 'mem_allocated' not in part_data[part]['nodes'][c]:
