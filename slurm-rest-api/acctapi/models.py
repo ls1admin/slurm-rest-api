@@ -24,7 +24,7 @@ class Assoc(Base):
 
 class Job(Base):
     __tablename__ = config.database['table_job']
-    # job_db_inx =  Column('job_db_inx', Integer, primary_key=True)
+    job_db_inx =  Column('job_db_inx', Integer, primary_key=True)
     # mod_time = Column('mod_time', Integer)
     # deleted = Column('deleted', Integer)
     account = Column('account', String)

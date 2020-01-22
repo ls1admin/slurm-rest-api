@@ -60,7 +60,8 @@ rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
 echo ""
 if [ "$pyslurm_version" ]; then
 	echo "Downloading conda dependencies"
-	conda install git mysql gcc cython --yes
+	conda install git mysql cython --yes
+	conda install -c anaconda gcc
 	rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
 
 	echo ""
