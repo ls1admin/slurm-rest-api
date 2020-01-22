@@ -21,8 +21,6 @@ Endpoints are
 
 Before setting up the api, you will need to install and run Slurm.
 
-You can setup this api on the machine running slurm, or on an environment that is setup as a sumbit host for your Slurm instance. This can be done by setting up `slurm-drmaa`.
-
 ##### Config
 Clone this repository, and then modify the `config.yml` file to match your slurmdb credentials and usage needs. Remove the `#` on each line you would like to use and modify their contents, otherwise the system will use the default values which likely will not align to your database.
 
@@ -37,15 +35,15 @@ Slurm-rest-api is dependant on conda being installed on your system. If you do n
 ##### Supported versions
 Slurm-rest-api has been tested to work on the following versions on slurm and pyslurm:
 
-Slurm version `15.08.4` on pyslurm `15.04.2` using the `override_pyslurm_version_hex` variable with the build script
+Slurm version `18.08.0` on pyslurm `18.08.0`.
 
 #### Setup Scripts
 The `build.sh` and `run.sh` scripts take care of the environment and dependencies needed for slurm-rest-api
 
 ##### Setup
-If you are running Slurm `17.11.0` - `17.11.2` you can install by simply running
+To build on slurm version `18.08.0`run:
 ```
-bash build.sh
+bash build.sh --pyslurm_version="18.08.0" 
 ```
 
 If you are running a different version of slurm, you will need to include the version arguments when running the script.
@@ -56,154 +54,14 @@ bash build.sh --help
 
 For a list of slurm versions that are supported by pyslurm, and more information on pyslurm install options, visit https://github.com/PySlurm/pyslurm
 
-##### Building on supported versions
-
-To build on slurm version `15.08.4`run:
-```
-bash build.sh --pyslurm_version="15.08.2" --override_pyslurm_version_hex="0x0f0804"
-```
-To build on slurm version `17.02.7` run:
-```
-bash build.sh --pyslurm_version="17.02.0" --override_pyslurm_version_hex="0x110207"
-```
-To build on slurm version `17.11.4` run:
-```
-bash build.sh --pyslurm_version="17.11.0" --override_pyslurm_version_hex="0x110b04"
-```
-
 ##### Run
 To run slurm-rest-api, run:
 ```
 bash run.sh
 ```
 
-#### Manual Setup
-This is an alternative set of setup instructions that can be used to install it manually.
-
-##### Setup
-
-Setup a Conda environment with the needed dependencies inside the clone slurm-rest-api directory:
-```
-conda create -prefix env python=2.7
-source activate env/
-conda install mysql cython git
-```
-
-Install the version of pyslurm to match your system. The version of pyslurm installed must be compatible with your installed version of slurm or Slurm-rest-api will not install. See https://github.com/PySlurm/pyslurm for more information and a list of supported versions.
-
-Our cluster runs on `slurm 15.08.4` which is unsupported by pyslurm. We can force pyslurm to use this version by editing the setup of `pyslurm 15.08.2`.
-
-```
-git clone https://github.com/PySlurm/pyslurm.git
-cd pyslurm
-git checkout 15.08.2
-sed -i 's/__max_slurm_hex_version__ = "0x0f0803"/__max_slurm_hex_version__ = "0x0f0804"/' setup.py
-python setup.py build
-pip install .
-```
-pyslurm is now installed on your conda environment.
-
-##### Install and Run
-
-Slurm-rest-api gets installed with pip and then runs locally with network access.
-
-Make sure your conda environment is activated, navigate into the root `slurm-rest-api` directory, and run the following:
-```
-pip install -e .
-export FLASK_APP=slurm-rest-api
-flask run --host'0.0.0.0'
-```
-
-Note: Installing with `python setup.py build` and `python setup.py install` is not supported.
-
+##### Testing
 To verify that Slurm-rest-api is running correctly, enable `serve_index` in `config.yml`, re-run the app, and open your browser to `http://localhost:5000/`. This page will verify that the routes are accessable. Note that some routes may take some time if your database is large.
-
-### Running with NGINX + UWSGI
-
-These instructions were tested to work on Centos7.
-
-If you are using a different version of linux and are not familiar with nginx + uwsgi you will likely be able to find a tutorial that suits your needs by googling "nginx uwsgi flask [linux flavor]".
-
-1: install conda
-Download and Install into /opt/miniconda2
-
-2: install epel-release, nginx
-```
-sudo yum install epel-release nginx
-```
-
-3: clone into /opt
-```
-cd /opt
-git clone...
-```
-Then configure slurm-rest-api and build. Make sure it is working as intended by running locally as described above before moving on.
-
-4: setup user+group permissions
-
-create a new group
-add yourself to the group
-add username nginx to the group
-```
-sudo groupadd slurm-rest-api-group
-sudo usermod -a -G slurm-rest-api-group username
-sudo usermod -a -G slurm-rest-api-group nginx
-```
-
-Verify the users have been added to the group
-```
-grep slurm-rest-api-group /etc/group
-```
-
-set slurm-rest-api-group as owner of /opt/slurm-rest-api and /opt/miniconda2
-```
-sudo chown -R :slurm-rest-api-group /opt/slurm-rest-api
-sudo chown -R :slurm-rest-api-group /opt/miniconda2
-sudo chmod -R 770 /opt/slurm-rest-api
-sudo chmod -R 770 /opt/miniconda2
-```
-sign out and back in to make sure your group permissions are active
-
-5: modify `/etc/nginx/nginx.conf` to use code block in `sample-block-nginx.conf`
-
-Make sure it matches your install location if you installed it somewhere other than /opt/
-
-6: add `slurm-rest-api.service` to `/etc/systemd/system/`
-
-Make sure it matches your install location if you installed it somewhere other than /opt/
-
-Also make sure the group matches if you used a group name other than slurm-rest-api-group
-
-7: start nginx if not already running
-```
-sudo systemctl start nginx
-```
-
-8: start slurm-rest-api
-```
-sudo systemctl start slurm-rest-api
-```
-
-9: enable both nginx and slurm-rest-api so they start on reboot
-```
-sudo systemctl enable nginx
-sudo systemctl enable slurm-rest-api
-```
-
-10: Set SELinux to permissive (if it is enabled).
-
-In `/etc/selinux/config` change `SELINUX=enforcing` to `SELINUX=permissive` to allow slurm-rest-api to connect.
-
-##### Logging
-You can uncomment the last line in `slurm-rest-api/slurm-rest-api.ini` to enable uwsgi logging.
-
-
-### Testing
-
-To run the `unittest` tests activate your conda environment and run:
-```
-bash tests.sh
-```
 
 ### Example routes for development
 
@@ -291,11 +149,6 @@ Returns a list of time stamped load information. When usage load archiving is ac
 | --- | --- | --- | --- | --- |
 | `time` | `=` | Time period of data to return, measured in seconds (last X seconds) | Same as `archive_wait_time` so a single entry is returned | `http://localhost:5000/load?time=60` |
 | `offset` | `=` | Number of seconds to skip, can be used as a "next page" when the number is set to a multiple of the limit parameter | `0` | `http://localhost:5000/load?time=60&offset=120` |
-
-
-## Front end exampls for the API ##
-https://github.com/phac-nml/slurm-rest-api-front
-
 
 ## Legal ##
 
