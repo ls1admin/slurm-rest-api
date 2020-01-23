@@ -7,7 +7,7 @@ system:
 #        archive_wait_time: 60    # Time to wait between log entries (in seconds), also sets the default time to retrieve load to value so it returns 1 item by default
 #        archive_path: 'db.json'  # Path to store db, creates a json file
 database:
-        db_host: 127.0.0.1                # Host address of account database
+        db_host: 127.0.0.1                # Host address of account database, if it is localhost, replace with 127.0.0.1
         db_user: slurm                       # Username to access database
         db_pass: password                       # Password
         db_name: slurmdb                  # Name of database

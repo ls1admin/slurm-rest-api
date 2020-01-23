@@ -9,9 +9,6 @@ while [ $# -gt 0 ]; do
 		--pyslurm_version=*)
 		  pyslurm_version="${1#*=}"
 		  ;;
-	  	--override_pyslurm_version_hex=*)
-		  override_pyslurm_version_hex="${1#*=}"
-		  ;;
 	  	--pyslurm_arguments=*)
 		  pyslurm_arguments="${1#*=}"
 		  ;;
@@ -31,11 +28,10 @@ then
 	echo "options:"
 	echo "            --help                            Shows this help page."
 	echo "            --pyslurm_version                 Use a specific version of pyslurm. Defaults to use the pypi version 17.11.0 via pip"
-	echo "            --override_pyslurm_version_hex    Override the maximum pyslurm hex code. This can be used to build for version of slurm that is not officially supported by pyslurm. --pyslurm_version must be set to use overriding."
 	echo "            --pyslurm_arguments               PySlurm build arguments for installation. See github.com/Pyslurm/pyslurm for more information on available arguments. --pyslurm_version must be set to use additional pyslurm arguments."
 	echo ""
-	echo "example:    Build for unsupported slurm version 15.08.4 by using 15.08.2 and overriding"
-	echo '            bash build.sh --pyslurm_version="15.08.2" --override_pyslurm_version_hex="0x0f0804"'
+	echo "example:    Build for slurm version 18.08.0 by using 18.08.0 and"
+	echo '            bash build.sh --pyslurm_version="18.08.0"'
 	echo ""
 	exit 0
 fi
@@ -63,6 +59,10 @@ if [ "$pyslurm_version" ]; then
 	conda install git mysql cython --yes
 	rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
 
+	# 'conda install gcc' may fail, install it from anaconda channel
+	conda install -c anaconda gcc
+	rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
+
 	echo ""
 	echo "Downloading pyslurm"
 	mkdir pyslurm-install
@@ -75,11 +75,6 @@ if [ "$pyslurm_version" ]; then
 	cd pyslurm
 	git checkout $pyslurm_version
 	rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
-
-	if [ "$override_pyslurm_version_hex" ]; then
-		sed -i "s/__max_slurm_hex_version__ =/__max_slurm_hex_version__ = \"$override_pyslurm_version_hex\"# /" setup.py
-		rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
-	fi
 
 	python setup.py build $pyslurm_arguments
 	rc=$?; if [[ $rc != 0 ]]; then echo "error: slurm-rest-api failed to build pyslurm."; exit $rc; fi
