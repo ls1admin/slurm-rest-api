@@ -59,10 +59,6 @@ if [ "$pyslurm_version" ]; then
 	conda install git mysql cython --yes
 	rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
 
-	# 'conda install gcc' may fail, install it from anaconda channel
-	conda install -c anaconda gcc
-	rc=$?; if [[ $rc != 0 ]]; then exit $rc; fi
-
 	echo ""
 	echo "Downloading pyslurm"
 	mkdir pyslurm-install
